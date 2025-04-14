@@ -1,3 +1,5 @@
+import os
+import subprocess
 
 opcodes = {
     # operation: [opcode, type, funct], funct for R-type instructions
@@ -91,5 +93,4 @@ registers = {
     
 }
 
-
-
+def parse_line(line): 
