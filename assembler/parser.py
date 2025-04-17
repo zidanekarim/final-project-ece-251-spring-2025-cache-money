@@ -116,20 +116,22 @@ def parse_lines(lines):
     parsed_lines = []
     for line in lines:
         line = line.strip()
-        if not line or line.startswith("#"):  # ignore empty lines and comments
+        if not line or line.startswith('#'):  # ignore empty lines and comments
             continue
         parts = line.split()
         if len(parts) < 1:
             print(f"Error: No instruction found in line {line}")
             continue
-        if len(parts) > 4:
-            print(f"Error: Too many arguments in line {line}")
-            continue
+        # if len(parts) > 4:
+        #     print(f"Error: Too many arguments in line {line}")
+        #     continue
         
-
+        print (f"Parsing line: {line}")
+        label = None
         if parts[0].endswith(":"):
             label = parts[0][:-1]
         if parts[0].startswith("."):
+
             directive = parts[0][1:]
             if directive == "data":
                 print("Data directive found.")
@@ -149,24 +151,76 @@ def parse_lines(lines):
             else:
                 print(f"Error: Unknown directive '{directive}'")
                 continue
+        if parts[1].startswith("."):
+
+            directive = parts[1][1:]
+            if directive == "data":
+                print("Data directive found.")
+                continue
+            elif directive == "text":
+                print("Text directive found.")
+                continue
+            elif directive == "global":
+                print("Global directive found.")
+                continue
+            elif directive == "org":
+                print("Org directive found.")
+                continue
+            elif directive == "end":
+                print("End directive found.")
+                continue
+            else:
+                print(f"Error: Unknown directive '{directive}'")
+                continue
+        
         if label is not None:
             parts = parts[1:]
+        if len(parts) < 1 or parts[0] == '#':
+            continue
+
+        
         opcode = parts[0]
         if opcode not in OPCODES_CONST:
             print(f"Error: Unknown opcode '{opcode}'")
             continue
-        register_arr = parts[1]
+        register_arr = []
+        immediate = None
+        endLabel = None
+        for reg in parts:
+            if reg.startswith("$"):
+                if reg.endswith(","):
+                    reg = reg[:-1]
+                if reg not in REGISTERS_CONST:
+                    print(f"Error: Unknown register '{reg}'")
+                    continue
+                else:
+                    register_arr.append(REGISTERS_CONST[reg])
+            elif reg.isdigit() or (reg[0] == '-' and reg[1:].isdigit()):
+                immediate = int(reg)
+                print(f"Immediate value: {immediate}")
+                if immediate < -32768 or immediate > 32767:
+                    print(f"Error: Immediate value '{immediate}' out of range")
+                    continue 
+            elif reg.startswith('#'):
+                break
+            elif reg.endswith(":"):
+                endLabel = reg[:-1]
         if len(register_arr) > 3:
             print(f"Error: Too many registers in line {line}")
             continue
+        instruction = {
+            "opcode": OPCODES_CONST[opcode][0],
+            "type": OPCODES_CONST[opcode][1],
+            "funct": OPCODES_CONST[opcode][2] if OPCODES_CONST[opcode][1] == 'R' else None,
+            "registers": register_arr,
+            "immediate": immediate,
+            "label": label if label is not None else None,
+            "endLabel": endLabel if endLabel is not None else None,
+        }
+        parsed_lines.append(instruction)
 
 
 
-
-        if opcode not in opcodes:
-            print(f"Error: Unknown opcode '{opcode}'")
-            continue
-        parsed_lines.append(parts)
     return parsed_lines
 
 
