@@ -1,7 +1,8 @@
 import os
 import subprocess
+import sys
 
-opcodes = {
+OPCODES_CONST = {
     # operation: [opcode, type, funct], funct for R-type instructions
     
     # R-type instructions (opcode = 0)
@@ -57,7 +58,7 @@ opcodes = {
 
 
 
-registers = {
+REGISTERS_CONST = {
     "$zero": 0,
     "$at": 1,
     "$v0": 2,
@@ -67,7 +68,7 @@ registers = {
     "$a2": 6,
     "$a3": 7,
     "$t0": 8,
-    "%t1": 9,
+    "$t1": 9,
     "$t2": 10,
     "$t3": 11,
     "$t4": 12,
@@ -93,4 +94,90 @@ registers = {
     
 }
 
-def parse_line(line): 
+def get_args():
+    if len(sys.argv) != 2:
+        print("Usage: python3 assembler.py <filename.asm>")
+        sys.exit(1)
+    filename = sys.argv[1]
+    if not os.path.isfile(filename):
+        print(f"File {filename} does not exist.")
+        sys.exit(1)
+    if not filename.endswith(".asm"):
+        print("File must have .asm extension.")
+        sys.exit(1)
+    return filename
+
+def parse_file(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+    return lines
+
+def parse_lines(lines):
+    parsed_lines = []
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#"):  # ignore empty lines and comments
+            continue
+        parts = line.split()
+        if len(parts) < 1:
+            print(f"Error: No instruction found in line {line}")
+            continue
+        if len(parts) > 4:
+            print(f"Error: Too many arguments in line {line}")
+            continue
+        
+
+        if parts[0].endswith(":"):
+            label = parts[0][:-1]
+        if parts[0].startswith("."):
+            directive = parts[0][1:]
+            if directive == "data":
+                print("Data directive found.")
+                continue
+            elif directive == "text":
+                print("Text directive found.")
+                continue
+            elif directive == "global":
+                print("Global directive found.")
+                continue
+            elif directive == "org":
+                print("Org directive found.")
+                continue
+            elif directive == "end":
+                print("End directive found.")
+                continue
+            else:
+                print(f"Error: Unknown directive '{directive}'")
+                continue
+        if label is not None:
+            parts = parts[1:]
+        opcode = parts[0]
+        if opcode not in OPCODES_CONST:
+            print(f"Error: Unknown opcode '{opcode}'")
+            continue
+        register_arr = parts[1]
+        if len(register_arr) > 3:
+            print(f"Error: Too many registers in line {line}")
+            continue
+
+
+
+
+        if opcode not in opcodes:
+            print(f"Error: Unknown opcode '{opcode}'")
+            continue
+        parsed_lines.append(parts)
+    return parsed_lines
+
+
+lines = parse_file(get_args())
+parsed_lines = parse_lines(lines)
+
+if not parsed_lines:
+    print("No valid instructions found.")
+    sys.exit(1)
+else:
+    print("Valid instructions found.")
+    print(parsed_lines)
+
+    
