@@ -114,114 +114,132 @@ def parse_file(filename):
 
 def parse_lines(lines):
     parsed_lines = []
+    label_table = {}
+    current_index = 0
+    pending_label = None
+
     for line in lines:
         line = line.strip()
-        if not line or line.startswith('#'):  # ignore empty lines and comments
+        if not line or line.startswith('#'):
             continue
         parts = line.split()
         if len(parts) < 1:
             print(f"Error: No instruction found in line {line}")
             continue
-        # if len(parts) > 4:
-        #     print(f"Error: Too many arguments in line {line}")
-        #     continue
-        
-        print (f"Parsing line: {line}")
-        label = None
+
+        print(f"Parsing line: {line}")
+
         if parts[0].endswith(":"):
-            label = parts[0][:-1]
-        if parts[0].startswith("."):
-
-            directive = parts[0][1:]
-            if directive == "data":
-                print("Data directive found.")
-                continue
-            elif directive == "text":
-                print("Text directive found.")
-                continue
-            elif directive == "global":
-                print("Global directive found.")
-                continue
-            elif directive == "org":
-                print("Org directive found.")
-                continue
-            elif directive == "end":
-                print("End directive found.")
-                continue
-            else:
-                print(f"Error: Unknown directive '{directive}'")
-                continue
-        if parts[1].startswith("."):
-
-            directive = parts[1][1:]
-            if directive == "data":
-                print("Data directive found.")
-                continue
-            elif directive == "text":
-                print("Text directive found.")
-                continue
-            elif directive == "global":
-                print("Global directive found.")
-                continue
-            elif directive == "org":
-                print("Org directive found.")
-                continue
-            elif directive == "end":
-                print("End directive found.")
-                continue
-            else:
-                print(f"Error: Unknown directive '{directive}'")
-                continue
-        
-        if label is not None:
+            pending_label = parts[0][:-1]
+            print(f"Label found: {pending_label}")
             parts = parts[1:]
-        if len(parts) < 1 or parts[0] == '#':
+            if not parts:
+                continue
+
+        if parts[0].startswith("."):
+            directive = parts[0][1:]
+            if directive in ["data", "text", "global", "org", "end"]:
+                print(f"{directive.capitalize()} directive found.")
+            else:
+                print(f"Error: Unknown directive '{directive}'")
+                break
+            if pending_label:
+                label_table[pending_label] = current_index
+            instruction = {
+                "opcode": None,
+                "type": None,
+                "funct": None, 
+                "registers": None,
+                "immediate": None,
+                "label": pending_label,
+                "endLabel": None,
+                "directive": directive,
+            }
+            parsed_lines.append(instruction)
+            pending_label = None
+            current_index += 1
             continue
 
-        
+        if len(parts) > 1 and parts[1].startswith("."):
+            directive = parts[1][1:]
+            if directive in ["data", "text", "global", "org", "end"]:
+                print(f"{directive.capitalize()} directive found.")
+            else:
+                print(f"Error: Unknown directive '{directive}'")
+                break
+            if pending_label:
+                label_table[pending_label] = current_index
+            instruction = {
+                "opcode": None,
+                "type": None,
+                "funct": None, 
+                "registers": None,
+                "immediate": None,
+                "label": pending_label,
+                "endLabel": None,
+                "directive": directive,
+            }
+            parsed_lines.append(instruction)
+            pending_label = None
+            current_index += 1
+            continue
+
+        # Parse opcode
         opcode = parts[0]
         if opcode not in OPCODES_CONST:
             print(f"Error: Unknown opcode '{opcode}'")
             continue
+
         register_arr = []
         immediate = None
         endLabel = None
-        for reg in parts:
+        for reg in parts[1:]:
             if reg.startswith("$"):
-                if reg.endswith(","):
-                    reg = reg[:-1]
+                reg = reg.rstrip(",")
                 if reg not in REGISTERS_CONST:
                     print(f"Error: Unknown register '{reg}'")
                     continue
-                else:
-                    register_arr.append(REGISTERS_CONST[reg])
+                register_arr.append(REGISTERS_CONST[reg])
             elif reg.isdigit() or (reg[0] == '-' and reg[1:].isdigit()):
                 immediate = int(reg)
                 print(f"Immediate value: {immediate}")
                 if immediate < -32768 or immediate > 32767:
                     print(f"Error: Immediate value '{immediate}' out of range")
-                    continue 
+                    continue
             elif reg.startswith('#'):
                 break
             elif reg.endswith(":"):
                 endLabel = reg[:-1]
+
         if len(register_arr) > 3:
             print(f"Error: Too many registers in line {line}")
             continue
+
         instruction = {
             "opcode": OPCODES_CONST[opcode][0],
             "type": OPCODES_CONST[opcode][1],
             "funct": OPCODES_CONST[opcode][2] if OPCODES_CONST[opcode][1] == 'R' else None,
             "registers": register_arr,
             "immediate": immediate,
-            "label": label if label is not None else None,
-            "endLabel": endLabel if endLabel is not None else None,
+            "label": None,
+            "endLabel": endLabel,
+            "directive": None,
         }
+
+        if pending_label:
+            label_table[pending_label] = current_index
+            instruction["label"] = pending_label
+            pending_label = None
+
         parsed_lines.append(instruction)
+        current_index += 1
 
-
+    print("Label Table:")
+    for label, idx in label_table.items():
+        print(f"{label}: {idx}")
 
     return parsed_lines
+
 
 
 lines = parse_file(get_args())
@@ -232,6 +250,9 @@ if not parsed_lines:
     sys.exit(1)
 else:
     print("Valid instructions found.")
-    print(parsed_lines)
+    
+    print("Parsed instructions:")
+    for instruction in parsed_lines:
+        print(instruction)
 
     
