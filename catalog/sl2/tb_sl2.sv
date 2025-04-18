@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: Prof Rob Marano
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim & Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: tb_sl2
 //     Description: Test bench for shift left by 2 (multiply by 4)
 //
@@ -12,27 +12,38 @@
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_SL2
 `define TB_SL2
+`timescale 1ns/1ps
 
-`timescale 1ns/100ps
 `include "sl2.sv"
 
 module tb_sl2;
-    parameter n = 32;
-    logic [(n-1):0] a, y;
+    parameter int WIDTH = 32;
 
-   initial begin
+    reg  [WIDTH-1:0] A;
+    wire [WIDTH-1:0] Y;
+
+    sl2 #(.WIDTH(WIDTH)) uut (
+        .A(A),
+        .Y(Y)
+    );
+
+    initial begin
         $dumpfile("sl2.vcd");
-        $dumpvars(0, uut);
-        //$monitor("a = %0b (0x%0h)(%0d) y = %0b (0x%0h)(%0d) ", a, a, a, y, y, y);
-        $monitor("time=%0t \t a=%b y=%b",$realtime, a, y);
+        $dumpvars(0, tb_sl2);
     end
 
     initial begin
-        a <= #n'h0000000F;
+        $display("\n time(ns) |       A       |       Y");
+        $monitor("%8t | 0x%0h | 0x%0h", $time, A, Y);
     end
 
-    sl2 uut(
-        .A(a), .Y(y)
-    );
+    initial begin
+        A = 32'h0000_0001; #10;  
+        A = 32'h0000_FFFF; #10; 
+        A = 32'h8000_0000; #10;  
+        A = 32'h1234_5678; #10;  
+        $finish;
+    end
+
 endmodule
 `endif // TB_SL2
