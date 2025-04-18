@@ -355,4 +355,5 @@ def assemble(parsed_lines, label_table):
 
 with open("program.dat", "w") as f:
     for code in assemble(parsed_lines, label_table):
-        f.write(f"{code:08x}\n")  
+        f.write(f"{code:08x}\n")
+        # writing the machine code to a file in hex format, 8 digits long (matching example)
