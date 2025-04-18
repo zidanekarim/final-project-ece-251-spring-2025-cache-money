@@ -1,32 +1,26 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: Prof Rob Marano
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim & Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: mux2
-//     Description: 2 to 1 multiplexer
-//
+//     Description: 2 to 1 multiplexer (parameterizable width)
 // Revision: 1.0
-//
 //////////////////////////////////////////////////////////////////////////////////
+
 `ifndef MUX2
 `define MUX2
 
-`timescale 1ns/100ps
-
-module mux2
-    #(parameter n = 32)(
-    //
-    // ---------------- PORT DEFINITIONS ----------------
-    //
-    input  logic [(n-1):0] D0, D1,
-    input  logic S,
-    output logic [(n-1):0] Y
+module mux2 #(
+    parameter n = 32           // width of data ports
+)(
+    input  logic        S,     // select
+    input  logic [n-1:0] D0,    // data input 0
+    input  logic [n-1:0] D1,    // data input 1
+    output logic [n-1:0] Y      // output
 );
-    //
-    // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
-    //
+    // simple combinational 2:1 mux
     assign Y = S ? D1 : D0;
 endmodule
 

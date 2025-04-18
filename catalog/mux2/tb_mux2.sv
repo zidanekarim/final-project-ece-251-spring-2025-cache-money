@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: Prof Rob Marano
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim & Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: tb_mux2
 //     Description: Test bench for 2 to 1 multiplexer
 //
@@ -14,42 +14,47 @@
 `define TB_MUX2
 
 `timescale 1ns/100ps
-`include "mux2.sv"
+
 `include "../clock/clock.sv"
 
 module tb_mux2;
-    parameter n = 32; // #bits for an operand
-    logic s;
-    logic [(n-1):0] d0, d1;
-    logic [(n-1):0] y;
-    wire clk;
-    logic enable;
+    parameter n = 32;             
 
+    logic            s;
+    logic [n-1:0]    d0, d1;
+    logic [n-1:0]    y;
+    logic            enable;
+    wire             clk;
 
-   initial begin
+    // dump all signals
+    initial begin
         $dumpfile("mux2.vcd");
-        $dumpvars(0, uut0, uut1);
-        // $monitor("s = %0b d0 = (0x%0h)(%0d) d1 = (0x%0h)(%0d) y = (0x%0h)(%0d)", s, d0, d0, d1, d1, y, y);
-        $monitor("time=%0t \t enable=%0b s=%0b y=%h d0=%h d1=%h",$realtime, enable, s, y, d0, d1);
+        $dumpvars(0, tb_mux2);
     end
 
     initial begin
-        d0 <= #n'h80000000;
-        d1 <= #n'h00000001;
-        enable <= 0;
-        #10 enable <= 1;
-        #10 s <= 1'b0;
-        #20 s <= 1'b1;
-        #100 enable <= 0;
-        $finish;
+        s      = 0;
+        d0     = 'hAAAAAAAA;
+        d1     = 'h55555555;
+        enable = 1;
+
+        #10  s = 0;    
+        #20  s = 1;    
+        #100 enable = 0; 
+        #5   $finish;
     end
 
-    mux2 uut0(
-        .S(s), .D0(d0), .D1(d1), .Y(y)
+    mux2 #(.n(n)) uut (
+        .S  (s),
+        .D0 (d0),
+        .D1 (d1),
+        .Y  (y)
     );
-    clock uut1(
+
+    clock clkgen (
         .ENABLE(enable),
-        .CLOCK(clk)
+        .CLOCK (clk)
     );
 endmodule
+
 `endif // TB_MUX2
