@@ -1,47 +1,29 @@
-#
-# Makefile for Verilog building
-# reference https://wiki.hacdc.org/index.php/Iverilogmakefile
-# 
-# USE THE FOLLOWING COMMANDS WITH THIS MAKEFILE
-#	"make check" - compiles your verilog design - good for checking code
-#	"make simulate" - compiles your design+TB & simulates your design
-#	"make display" - compiles, simulates and displays waveforms
-# 
-###############################################################################
-#
-# CHANGE THESE THREE LINES FOR YOUR DESIGN
-#
-#TOOL INPUT
-COMPONENT = signext
-#SRC = $(shell ls *.sv)
-SRC = $(wildcard *.sv)
-SIM_ARGS=+a=3 +b=2 +s=0
-TBOUTPUT = $(COMPONENT).vcd	# THIS NEEDS TO MATCH THE OUTPUT FILE
-									# FROM YOUR TESTBENCH
-###############################################################################
-# BE CAREFUL WHEN CHANGING ITEMS BELOW THIS LINE
-###############################################################################
-#TOOLS
-COMPILER = iverilog
-SIMULATOR = vvp
-VIEWER = gtkwave #works on your host, not docker container since it's a GUI
-#TOOL OPTIONS
-COFLAGS = -g2012 #-v
-SFLAGS = -M . #-v
-SOUTPUT = -lxt2		#SIMULATOR OUTPUT TYPE
-#TOOL OUTPUT
-#COUTPUT = compiler.out			#COMPILER OUTPUT
-###############################################################################
-#MAKE DIRECTIVES
-.PHONY: compile simulate display clean
-compile : $(SRC)
-	$(COMPILER) $(COFLAGS) -o $(COMPONENT).vvp $(SRC)
+# File: Makefile
+# Targets:
+#   make compile   – build the simulation
+#   make simulate  – run it (prints monitor output)
+#   make view      – open GTKWave on signext.vcd
+#   make clean     – erase generated files
 
-simulate: $(COMPONENT).vvp
-	$(SIMULATOR) $(SFLAGS) $(COMPONENT).vvp $(SOUTPUT)
+COMPONENT  = signext
+SRC        = signext.sv tb_signext.sv
 
-display: $(TBOUTPUT)
-	$(VIEWER) $(TBOUTPUT) &
+IVERILOG   = iverilog
+VVP        = vvp
+GTKWAVE    = gtkwave
+COFLAGS    = -g2012
+VCDFILE    = $(COMPONENT).vcd
+
+.PHONY: compile simulate view clean
+
+compile:
+	$(IVERILOG) $(COFLAGS) -o $(COMPONENT).vvp $(SRC)
+
+simulate: compile
+	$(VVP) $(COMPONENT).vvp
+
+view: simulate
+	$(GTKWAVE) $(VCDFILE) &
 
 clean:
-	/bin/rm -f $(COMPONENT).vvp *.vcd a.out compiler.out
+	rm -f $(COMPONENT).vvp $(VCDFILE)
