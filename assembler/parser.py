@@ -194,8 +194,6 @@ def parse_lines(lines):
         immediate = None
         endLabel = None
         for reg in parts[1:]:
-            #print(f"Registers: {reg}")
-            # split by comma if there are multiple registers
             if ',' in reg and reg.count(',') > 1:
                 reg = reg.split(',')
                 for r in reg:
@@ -223,10 +221,6 @@ def parse_lines(lines):
                             continue
                         register_arr.append(REGISTERS_CONST[base])
                 break 
-
-
-
-
 
             reg = reg.strip()
             if reg.startswith("$"):
