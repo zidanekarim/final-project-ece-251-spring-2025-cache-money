@@ -194,6 +194,41 @@ def parse_lines(lines):
         immediate = None
         endLabel = None
         for reg in parts[1:]:
+            #print(f"Registers: {reg}")
+            # split by comma if there are multiple registers
+            if ',' in reg and reg.count(',') > 1:
+                reg = reg.split(',')
+                for r in reg:
+                    r = r.strip()
+                    if r.startswith("$"):
+                        r = r.rstrip(",")
+                        if r not in REGISTERS_CONST:
+                            print(f"Error: Unknown register '{r}'")
+                            continue
+                        register_arr.append(REGISTERS_CONST[r])
+                    elif r.isdigit() or (r[0] == '-' and r[1:].isdigit()):
+                        immediate = int(r)
+                        print(f"Immediate value: {immediate}")
+                        if immediate < -32768 or immediate > 32767:
+                            print(f"Error: Immediate value '{immediate}' out of range")
+                            continue
+                    elif r.startswith('#'):
+                        break
+                    elif ')' in r and '(' in r:
+                        offset, base = r.replace(')', '').split('(')
+                        immediate = int(offset)
+                        base = base.strip()
+                        if base not in REGISTERS_CONST:
+                            print(f"Error: Unknown base register '{base}'")
+                            continue
+                        register_arr.append(REGISTERS_CONST[base])
+                break 
+
+
+
+
+
+            reg = reg.strip()
             if reg.startswith("$"):
                 reg = reg.rstrip(",")
                 if reg not in REGISTERS_CONST:
@@ -208,6 +243,15 @@ def parse_lines(lines):
                     continue
             elif reg.startswith('#'):
                 break
+            elif ')' in reg and '(' in reg:
+                offset, base = reg.replace(')', '').split('(')
+                immediate = int(offset)
+                base = base.strip()
+                if base not in REGISTERS_CONST:
+                    print(f"Error: Unknown base register '{base}'")
+                    continue
+                register_arr.append(REGISTERS_CONST[base])
+
             elif reg.endswith(":"):
                 endLabel = reg[:-1]
 
@@ -238,12 +282,14 @@ def parse_lines(lines):
     for label, idx in label_table.items():
         print(f"{label}: {idx}")
 
-    return parsed_lines
+    return (parsed_lines, label_table)
 
 
 
 lines = parse_file(get_args())
-parsed_lines = parse_lines(lines)
+parsed_lines_return = parse_lines(lines)
+parsed_lines, label_table = parsed_lines_return
+
 
 if not parsed_lines:
     print("No valid instructions found.")
@@ -255,4 +301,64 @@ else:
     for instruction in parsed_lines:
         print(instruction)
 
-    
+def assemble(parsed_lines, label_table):
+    machine_code = []
+
+    for i, instr in enumerate(parsed_lines):
+        if instr["directive"]:
+            continue 
+
+        opcode = instr["opcode"]
+        instr_type = instr["type"]
+
+        if instr_type == "R":
+            rd = instr["registers"][0] if len(instr["registers"]) > 0 else 0
+            rs = instr["registers"][1] if len(instr["registers"]) > 1 else 0
+            rt = instr["registers"][2] if len(instr["registers"]) > 2 else 0
+            shamt = 0  # idk if we ever need to use for our assembler
+            funct = instr["funct"]
+            code = (opcode << 26) | (rs << 21) | (rt << 16) | (rd << 11) | (shamt << 6) | funct 
+            # this is basically shifting the bits to the left and ORing them together, which is like a bitmask to follow the MIPS instruction format
+            # opcode: 6 bits, rs: 5 bits, rt: 5 bits, rd: 5 bits, shamt: 5 bits, funct: 6 bits
+
+        elif instr_type == "I":
+            rt = instr["registers"][0] if len(instr["registers"]) > 0 else 0
+            rs = instr["registers"][1] if len(instr["registers"]) > 1 else 0
+            imm = instr["immediate"] if instr["immediate"] is not None else 0
+
+            if instr["endLabel"]: 
+                target_index = label_table.get(instr["endLabel"])
+                if target_index is None:
+                    print(f"Error: Label {instr['endLabel']} not found.")
+                    continue
+                imm = target_index - (i + 1)  # relative address so we subtract the current index + 1 (next instruction) from the label index, grows downward
+
+            imm &= 0xFFFF  # mask to 16 bits, 1 hex digit = 4 bits, so 4 hex digits = 16 bits
+            # this is to ensure the immediate value fits in 16 bits, since MIPS uses 16 bit signed integers
+            code = (opcode << 26) | (rs << 21) | (rt << 16) | imm
+            # opcode: 6 bits, rs: 5 bits, rt: 5 bits, immediate: 16 bits
+        elif instr_type == "J":
+            if instr["endLabel"] is None:
+                print(f"Error: J-type instruction missing label.")
+                continue
+            target_index = label_table.get(instr["endLabel"])
+            if target_index is None:
+                print(f"Error: Label {instr['endLabel']} not found.")
+                continue
+            address = target_index  
+            code = (opcode << 26) | (address & 0x03FFFFFF)
+            # opcode: 6 bits, address (immediate or register): 26 bits
+            # note the 0x03FFFFFF is maximum value for signed 26 bits, so we are masking the address to fit in 26 bits
+            # maybe switch to unsigned since its an address? not really sure
+
+        else:
+            print(f"Unknown instruction type at line {i}")
+            continue
+
+        machine_code.append(code) # storing machine code array
+
+    return machine_code
+
+with open("program.dat", "w") as f:
+    for code in assemble(parsed_lines, label_table):
+        f.write(f"{code:08x}\n")  
