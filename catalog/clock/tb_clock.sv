@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: Prof Rob Marano
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim & Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: tb_clock
 //     Description: Test bench for clock generator
 //
@@ -14,30 +14,34 @@
 `define TB_CLOCK
 
 `timescale 1ns/100ps
-`include "clock.sv"
 
 module tb_clock;
-    wire clk;
-    logic enable;
+    parameter real PERIOD = 10.0;
 
-   initial begin
+    reg  enable = 0;
+    wire clk;
+
+    clock #(.PERIOD(PERIOD)) uut (
+        .ENABLE(enable),
+        .CLOCK (clk)
+    );
+
+    initial begin
         $dumpfile("clock.vcd");
-        $dumpvars(0, uut);
-        //$monitor("enable = %b clk = %b", enable, clk);
-        $monitor("time=%0t \t enable=%b clk=%b",$realtime, enable, clk);
+        $dumpvars(0, tb_clock);
     end
 
     initial begin
-        enable <= 0;
-        #10 enable <= 1;
-        #100 enable <= 0;
-        $finish;
+        $monitor("%0t ns | ENABLE=%b | CLK=%b", $time, enable, clk);
     end
 
-   clock uut(
-        .ENABLE(enable),
-        .CLOCK(clk)
-    );
+    initial begin
+        #0   enable = 0;   
+        #10  enable = 1;   
+        #100 enable = 0;   
+        #10  $finish;      
+    end
+
 endmodule
 
 `endif // TB_CLOCK

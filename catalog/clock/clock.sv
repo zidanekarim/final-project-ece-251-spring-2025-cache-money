@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: Prof Rob Marano
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim & Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: clock
 //     Description: Clock generator; duty cycle = 50%
 //
@@ -15,44 +15,25 @@
 
 `timescale 1ns/100ps
 
-module clock
-    #(parameter ticks = 10)(
-    //
-    // ---------------- PORT DEFINITIONS ----------------
-    //
-    input ENABLE,
-    output reg CLOCK
+module clock #(
+    parameter real PERIOD = 10.0    
+)(
+    input  wire ENABLE,             
+    output reg  CLOCK = 0          
 );
-    //
-    // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
-    //
-    reg start_clock;
-    real clock_on = ticks/2; // duty cycle = 50%
-    real clock_off = ticks/2;
 
-    // initialize variables
+    localparam real HALF = PERIOD / 2.0;
+
     initial begin
-      CLOCK <= 0;
-      start_clock <= 0;
+        forever begin
+            wait (ENABLE);
+            while (ENABLE) begin
+                #(HALF) CLOCK = ~CLOCK;
+            end
+            CLOCK = 0;
+        end
     end
 
-    always @(posedge ENABLE or negedge ENABLE) begin
-        if (ENABLE) begin
-            start_clock = 1;
-        end
-        else begin
-            start_clock = 0;
-        end
-        // #ticks CLOCK = ~CLOCK;
-    end
-    always @(start_clock) begin
-        CLOCK = 0;
-        while (start_clock) begin
-            #(clock_off) CLOCK = 1;
-            #(clock_on) CLOCK = 0;
-        end
-        CLOCK = 0;
-    end
 endmodule
 
 `endif // CLOCK
