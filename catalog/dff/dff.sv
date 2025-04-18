@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: Prof Rob Marano
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim, Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: dff
 //     Description: 32 bit D flip flop
 //
@@ -16,28 +16,25 @@
 `timescale 1ns/100ps
 
 module dff
-    #(parameter n = 32)(
     //
-    // ---------------- PORT DEFINITIONS ----------------
+    // ---------------- DECLARATIONS OF PORT IN/OUT & DATA TYPES ----------------
     //
-    input  logic CLOCK, RESET,
-    input  logic [(n-1):0] D,
-    output logic [(n-1):0] Q
+(
+  input logic clk,
+  input logic rst,
+  input logic enable,
+  input logic d,
+  output logic q
 );
     //
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
     //
-    always @(posedge CLOCK, posedge RESET)
-    begin
-        if (RESET)
-        begin
-            Q <= 0;
-        end
-        else
-        begin
-            Q <= D;
-        end
+  always_ff @(posedge clk, posedge rst) begin
+    if (rst) begin
+      q <= 0; // Synchronous reset
+    end else if (enable) begin
+      q <= d; // Data is loaded only when enable is high
     end
-endmodule
-
-`endif // DFF
+  end
+endmodule : dff
+`endif // dff
