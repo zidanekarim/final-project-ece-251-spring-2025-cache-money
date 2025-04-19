@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: YOUR NAMES
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim & Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: adder
 //     Description: simple behavorial adder
 //
@@ -12,20 +12,16 @@
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef ADDER
 `define ADDER
+`timescale 1ns/1ps
 
-`timescale 1ns/100ps
-
-module adder
-    #(parameter n = 32)(
-    //
-    // ---------------- PORT DEFINITIONS ----------------
-    //
-
+module adder #(
+    parameter int WIDTH = 32
+)(
+    input  logic [WIDTH-1:0] A,
+    input  logic [WIDTH-1:0] B,
+    output logic [WIDTH-1:0] Y
 );
-    //
-    // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
-    //
-
+    assign Y = A + B;
 endmodule
 
 `endif // ADDER

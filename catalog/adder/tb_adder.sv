@@ -1,38 +1,41 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
-// ECE 251 Spring 2024
-// Engineer: YOUR NAMES
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim & Tyler Lee
 // 
-//     Create Date: 2023-02-07
+//     Create Date: 2025-04-18
 //     Module Name: tb_adder
 //     Description: Test bench for simple behavorial adder
 //
 // Revision: 1.0
 //
 //////////////////////////////////////////////////////////////////////////////////
-`ifndef TB_ADDER
-`define TB_ADDER
-
-`timescale 1ns/100ps
-`include "adder.sv"
+`timescale 1ns/1ps
 
 module tb_adder;
-    parameter n = 32;
-    logic [(n-1):0] a, b, y;
+    parameter int WIDTH = 32;
+    reg  [WIDTH-1:0] a, b;
+    wire [WIDTH-1:0] y;
 
-   initial begin
+    // dump & monitor
+    initial begin
         $dumpfile("adder.vcd");
-        $dumpvars(0, uut);
-        $monitor("a = 0x%0h b = 0x%0h y = 0x%0h", a, b, y);
+        $dumpvars(0, tb_adder);
+        $display("\n time(ns) |       A       |       B       |       Y");
+        $monitor("%8t | 0x%0h | 0x%0h | 0x%0h", $time, a, b, y);
     end
 
     initial begin
-        a <= #n'hFFFFFFFF;
-        b <= #n'hFFFFFFFF;
+        a = 0;            b = 0;            #10;
+        a = 1;            b = 1;            #10;
+        a = 'hFFFFFFFF;   b = 1;            #10;
+        a = 'h7FFFFFFF;   b = 1;            #10;
+        a = 'hFFFFFFFF;   b = 'hFFFFFFFF;   #10;
+        $finish;
     end
 
-    adder uut(
+    // instantiate DUT (adder.sv must be compiled alongside)
+    adder #(.WIDTH(WIDTH)) uut (
         .A(a), .B(b), .Y(y)
     );
 endmodule
-`endif // TB_ADDER
