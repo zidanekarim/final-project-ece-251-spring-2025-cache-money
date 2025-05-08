@@ -1,6 +1,19 @@
 import os
 import subprocess
 import sys
+"""
+//////////////////////////////////////////////////////////////////////////////////
+// The Cooper Union
+// ECE 251 Spring 2025
+// Engineer: Zidane Karim
+// 
+//     Create Date: 2025-05-08
+//     Description: Assembler for MIPS assembly language, uses Python to parse and convert and contains most of the functionality of the original assembler
+//
+// Revision: 1.0
+//
+//////////////////////////////////////////////////////////////////////////////////
+"""
 
 OPCODES_CONST = {
     # operation: [opcode, type, funct], funct for R-type instructions
