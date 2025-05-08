@@ -306,12 +306,21 @@ def assemble(parsed_lines, label_table):
         instr_type = instr["type"]
 
         if instr_type == "R":
-            rd = instr["registers"][0] if len(instr["registers"]) > 0 else 0
-            rs = instr["registers"][1] if len(instr["registers"]) > 1 else 0
-            rt = instr["registers"][2] if len(instr["registers"]) > 2 else 0
-            shamt = 0  # idk if we ever need to use for our assembler
             funct = instr["funct"]
-            code = (opcode << 26) | (rs << 21) | (rt << 16) | (rd << 11) | (shamt << 6) | funct 
+            if funct in [0x18, 0x19]:  # mult, multu
+                rs = instr["registers"][1]
+                rt = instr["registers"][0]
+                rd = 0
+            elif funct in [0x10, 0x12]:  # mfhi, mflo
+                rs = 0
+                rt = 0
+                rd = instr["registers"][0]
+            else:
+                rd = instr["registers"][0]
+                rs = instr["registers"][1]
+                rt = instr["registers"][2]
+            shamt = 0
+            code = (opcode << 26) | (rs << 21) | (rt << 16) | (rd << 11) | (shamt << 6) | funct
             # this is basically shifting the bits to the left and ORing them together, which is like a bitmask to follow the MIPS instruction format
             # opcode: 6 bits, rs: 5 bits, rt: 5 bits, rd: 5 bits, shamt: 5 bits, funct: 6 bits
 
@@ -353,7 +362,10 @@ def assemble(parsed_lines, label_table):
 
     return machine_code
 
-with open("../catalog/imem/program.dat", "w") as f:
+with open("../catalog/computer/program.dat", "w") as f:
     for code in assemble(parsed_lines, label_table):
         f.write(f"{code:08x}\n")
+    # pad with zeros to until 64 lines 
+    for _ in range(64 - len(assemble(parsed_lines, label_table))):
+        f.write("00000000\n")
         # writing the machine code to a file in hex format, 8 digits long (matching example)
