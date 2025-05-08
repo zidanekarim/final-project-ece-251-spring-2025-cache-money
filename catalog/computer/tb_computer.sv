@@ -32,6 +32,7 @@ module tb_computer;
 
   // instantiate the CPU as the device to be tested
   computer dut(clk, reset, writedata, dataadr, memwrite);
+
   // generate clock to sequence tests
   // always
   //   begin
@@ -70,7 +71,7 @@ module tb_computer;
       $display("\t+aluop = 0b%2b",dut.mips.c.ad.aluop);
       $display("\t+alucontrol = 0b%4b",dut.mips.c.ad.alucontrol);
       $display("\t+alu result = 0x%8h",dut.mips.dp.alu.result);
-      $display("\t+HiLo = 0x%8h",dut.mips.dp.alu.HiLo);
+     // $display("\t+HiLo = 0x%8h",dut.mips.dp.alu.HiLo);
       $display("\t+$v0 = 0x%4h",dut.mips.dp.rf.rf[2]);
       $display("\t+$v1 = 0x%4h",dut.mips.dp.rf.rf[3]);
       $display("\t+$a0 = 0x%4h",dut.mips.dp.rf.rf[4]);
@@ -99,7 +100,7 @@ module tb_computer;
     $display("\t-aluop = 0b%2b",dut.mips.c.ad.aluop);
     $display("\t-alucontrol = 0b%4b",dut.mips.c.ad.alucontrol);
     $display("\t-alu result = 0x%8h",dut.mips.dp.alu.result);
-    $display("\t-HiLo = 0x%8h",dut.mips.dp.alu.HiLo);
+   // $display("\t-HiLo = 0x%8h",dut.mips.dp.alu.HiLo);
     $display("\t-$v0 = 0x%4h",dut.mips.dp.rf.rf[2]);
     $display("\t-$v1 = 0x%4h",dut.mips.dp.rf.rf[3]);
     $display("\t-$a0 = 0x%4h",dut.mips.dp.rf.rf[4]);
