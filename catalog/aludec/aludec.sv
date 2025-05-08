@@ -29,6 +29,8 @@ module aludec
     //
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
     //
+
+    
     always @(*) begin
         case (aluop)
             2'b00: alucontrol = 4'b0000; // add (for lw/sw)
