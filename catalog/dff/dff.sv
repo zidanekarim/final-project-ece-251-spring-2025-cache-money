@@ -16,6 +16,7 @@
 `timescale 1ns/100ps
 
 module dff
+  # (parameter n = 32) // Parameterized width of the flip-flop
     //
     // ---------------- DECLARATIONS OF PORT IN/OUT & DATA TYPES ----------------
     //
@@ -23,8 +24,8 @@ module dff
   input logic clk,
   input logic rst,
   input logic enable,
-  input logic d,
-  output logic q
+  input logic [(n-1):0]d,
+  output logic [(n-1):0] q
 );
     //
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------

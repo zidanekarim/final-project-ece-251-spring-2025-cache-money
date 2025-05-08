@@ -33,6 +33,8 @@ module tb_imem;
         #10 imem_addr <= #(r)'b000000;
         #10 imem_addr <= #(r)'b000001;
         #10 imem_addr <= #(r)'b000010;
+        #10 imem_addr <= #(r)'b000011;
+        #10 imem_addr <= #(r)'b000100; // although this doesn't show all instructions in the file, when the imem is loaded, it will be able to read all instructions in the file
         $finish;
     end
 

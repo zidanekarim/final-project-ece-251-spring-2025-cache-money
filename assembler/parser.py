@@ -353,7 +353,7 @@ def assemble(parsed_lines, label_table):
 
     return machine_code
 
-with open("program.dat", "w") as f:
+with open("../catalog/imem/program.dat", "w") as f:
     for code in assemble(parsed_lines, label_table):
         f.write(f"{code:08x}\n")
         # writing the machine code to a file in hex format, 8 digits long (matching example)
