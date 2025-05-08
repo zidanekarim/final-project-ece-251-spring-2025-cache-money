@@ -15,9 +15,10 @@
 module mux2 #(
     parameter n = 32           // width of data ports
 )(
-    input  logic        S,     // select
+        // select
     input  logic [n-1:0] D0,    // data input 0
     input  logic [n-1:0] D1,    // data input 1
+    input  logic        S, 
     output logic [n-1:0] Y      // output
 );
     // simple combinational 2:1 mux

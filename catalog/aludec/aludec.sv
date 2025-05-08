@@ -21,34 +21,34 @@ module aludec
     //
 
     #(parameter n = 32)( 
-        input logic [1:0] ALUOp, // ALU operation code
+        input logic [1:0] aluop, // ALU operation code
         input logic [5:0] funct, // function code
-        output logic [3:0] ALUControl // ALU control signal
+        output logic [3:0] alucontrol // ALU control signal
     );
 
     //
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
     //
     always @(*) begin
-        case (ALUOp)
-            2'b00: ALUControl = 4'b0000; // add (for lw/sw)
-            2'b01: ALUControl = 4'b0001; // sub (for beq)
+        case (aluop)
+            2'b00: alucontrol = 4'b0000; // add (for lw/sw)
+            2'b01: alucontrol = 4'b0001; // sub (for beq)
             2'b10: begin                 // R-type, check funct
                 case (funct)
-                    6'b100000: ALUControl = 4'b0000; // add
-                    6'b100010: ALUControl = 4'b0001; // sub
-                    6'b100100: ALUControl = 4'b0100; // and
-                    6'b100101: ALUControl = 4'b0101; // or
-                    6'b100111: ALUControl = 4'b0110; // nor (~a)
-                    6'b000000: ALUControl = 4'b0111; // sll
-                    6'b000010: ALUControl = 4'b1000; // srl
-                    6'b100110: ALUControl = 4'b0010; // xor (bonus baddie)
-                    6'b011000: ALUControl = 4'b0010; // mult (alias for * slay)
-                    6'b011010: ALUControl = 4'b0011; // div (alias for / yas)
-                    default:   ALUControl = 4'b1111; // INVALID. Like my GPA rn 💀
+                    6'b100000: alucontrol = 4'b0000; 
+                    6'b100010: alucontrol = 4'b0001; 
+                    6'b100100: alucontrol = 4'b0100; 
+                    6'b100101: alucontrol = 4'b0101; 
+                    6'b100111: alucontrol = 4'b0110; 
+                    6'b000000: alucontrol = 4'b0111; 
+                    6'b000010: alucontrol = 4'b1000; 
+                    6'b100110: alucontrol = 4'b0010; 
+                    6'b011000: alucontrol = 4'b0010; 
+                    6'b011010: alucontrol = 4'b0011; 
+                    default:   alucontrol = 4'b1111; 
                 endcase
             end
-            default: ALUControl = 4'b1111; // Invalid ALUOp
+            default: alucontrol = 4'b1111; // Invalid ALUOp
         endcase
     end
 
