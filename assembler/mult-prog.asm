@@ -8,5 +8,5 @@ Main:                                                      # MIPS machine code
     mult $v0, $v1           # $HiLo = $v0 * $v1            ; 00620018
     mfhi $v0                # $v0 = HiLo[(n-1):0]          ; 00001010
     mflo $v1                # $v1 = HiLo[(2*n-1):n]        ; 00001110
-    sw $v0, 84($zero)       # store sum in mem[84] = 0x96  ; ac020054
+    sw $v1, 84($zero)       # store sum in mem[84] = 0x96  ; ac020054
 End:  .end                  # final sum in LSB of 4th word from top.
