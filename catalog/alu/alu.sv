@@ -24,7 +24,7 @@ module alu #(parameter N = 32)(
     output logic zero
 );
 
-     logic [2*N-1:0] mult_result;
+    logic [2*N-1:0] mult_result;
     logic [N-1:0] hi_reg, lo_reg;
 
     assign zero = (result == 0);
@@ -37,17 +37,17 @@ module alu #(parameter N = 32)(
             4'b0000: result = sign ? $signed(a) + $signed(b) : a + b;
             4'b0001: result = sign ? $signed(a) - $signed(b) : a - b;
             4'b0010: begin 
-                mult_result = sign ? $signed(a) * $signed(b) : a * b;
+                mult_result = sign ? $signed(a) * $signed(b) : a * b; 
                 result = mult_result[N-1:0]; 
             end
             4'b0011: result = sign ? $signed(a) / $signed(b) : a / b;
             4'b0100: result = a & b;
             4'b0101: result = a | b;
             4'b0110: result = ~a;
-            4'b0111: result = a << b;
-            4'b1000: result = a >> b;
-            4'b1110: result = lo_reg; 
-            4'b1111: result = hi_reg; 
+            4'b0111: result = a << b; // logical shift left
+            4'b1000: result = a >> b; // logical shift right
+            4'b1110: result = lo_reg; // mflo 
+            4'b1111: result = hi_reg; // mfhi
             default: result = {N{1'b0}};
         endcase
     end
@@ -55,8 +55,8 @@ module alu #(parameter N = 32)(
     //  update to hi/lo on mult
     always_ff @(posedge clk) begin
         if (alucontrol == 4'b0010) begin
-            hi_reg <= mult_result[2*N-1:N];
-            lo_reg <= mult_result[N-1:0];
+            hi_reg <= mult_result[2*N-1:N]; // upper half
+            lo_reg <= mult_result[N-1:0]; // lower half
         end
     end
 
