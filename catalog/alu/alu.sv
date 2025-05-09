@@ -8,7 +8,6 @@
 //     Description: 32-bit RISC-based CPU alu (MIPS)
 //
 // Revision: 1.0
-// see https://github.com/Caskman/MIPS-Processor-in-Verilog/blob/master/ALU32Bit.v
 //////////////////////////////////////////////////////////////////////////////////
 
 `timescale 1ns/100ps
