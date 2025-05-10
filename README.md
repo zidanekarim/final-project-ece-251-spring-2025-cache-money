@@ -8,7 +8,7 @@ This project implements a 32-bit single-cycle MIPS CPU using Verilog. The design
 
 ## CPU Design
 
-![alt text](image-6.png)
+![alt text](assets/image-6.png)
 
 
 ## Supported Instructions
