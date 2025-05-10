@@ -20,7 +20,7 @@ The CPU supports a broad subset of the MIPS32 instruction set.
 - PC increment: 32 bits
 - Memory addressable by words (32 bits)
 
-![alt text](image.png)
+![alt text](assets/image.png)
 
 
 ### R-Type
@@ -31,19 +31,19 @@ The CPU supports a broad subset of the MIPS32 instruction set.
 - Move: `mfhi`, `mflo`
 - Control: `jr`
 
-![alt text](image-1.png)
+![alt text](assets/image-1.png)
 
 ### I-Type
 - Arithmetic/Logic: `addi`, `addiu`, `andi`, `ori`, `xori`, `slti`, `sltiu`
 - Memory: `lw`, `sw`, `lb`, `lbu`, `lh`, `lhu`, `sb`, `sh`, `lui`
 - Branch: `beq`, `bne`, `blez`, `bgtz`, `bltz`, `bgez`
 
-![alt text](image-2.png)
+![alt text](assets/image-2.png)
 
 ### J-Type
 - `j`, `jal`
 
-![alt text](image-3.png)
+![alt text](assets/image-3.png)
 
 
 ## Control Signals
@@ -52,14 +52,14 @@ The control unit generates the following signals:
 
 Control logic is handled by `maindec.sv` and `aludec.sv`, which translate opcodes and function fields into control signals.
 
-![alt text](image-4.png)
+![alt text](assets/image-4.png)
 
 ## Register File
 - 32 general-purpose registers: `$zero` to `$ra`
 - Special-purpose: `$at`, `$k0`, `$k1`
 - Caller-saved and callee-saved conventions are followed
 
-![alt text](image-5.png)
+![alt text](assets/image-5.png)
 
 ## Assembler
 The `assembler/parser.py` is a Python script that:
